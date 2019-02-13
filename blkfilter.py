@@ -2,6 +2,7 @@ import os
 import subprocess
 import json
 import glob
+import re
 
 
 SYS_DEV = '/sys/devices/'
@@ -29,8 +30,9 @@ ISCSI_TARGET_PATH = SYS_DEV + 'platform/%s/%s/%s/iscsi_connection/%s'  # host, s
 #    ...
 
 # sometimes we would like to have a range for some parameter
-# for this we need to use additional filter name
-ADDITIONAL_DISK_FILTER = ['min_size', 'max_size']
+# or regex or glob instead of exact name
+# for these purposes we need to use additional filter name
+ADDITIONAL_DISK_FILTER = ['min_size', 'max_size', 'name_glob', 'model_regex']
 
 
 class BlkFilterPartition(object):
@@ -75,7 +77,7 @@ class BlkDeviceInfo(object):
             devtree_json = subprocess.check_output(['lsblk', '-i', '-a', '-b', '-O', '-J'])
             devtree_dict = json.loads(devtree_json, encoding="ascii")
 
-
+            # Add parameters or tune that ones returned by lsblk
             for d in devtree_dict['blockdevices']:
 
                 # add target IP address and port number for iSCSI devices
@@ -91,6 +93,15 @@ class BlkDeviceInfo(object):
 
                     with open((ISCSI_TARGET_PATH % (host, session, connection, connection)) + '/port' ) as port:
                         d['iscsi_target_port'] = port.read().strip()
+
+                # FIXME: for some devices we have got vendor ID, instead of vendor name
+                # for example for nvme disc with PCIE controller
+                # to get a vendor name we need to parse 'hwdata' file.
+                # As a workaround combine vendor name and model, which usually also contains
+                # mention of vendor name
+
+                d['model'] = str(d['vendor']).strip() + ' ' + str(d['model']).strip()
+                d['vendor'] = d['model']
 
         except (subprocess.CalledProcessError, ValueError):
             return {}
@@ -164,10 +175,13 @@ class BlkDeviceInfo(object):
                         rotational = '1' if filters['rota'] else '0'
                         if disk['rota'] != rotational:
                             all_filters_passed = False
-                    elif f_name == 'name':
-                        if SYS_BLOCK + disk['name'] not in glob.glob(SYS_BLOCK + filters['name']):
+                    elif f_name in ('name', 'name_glob'):
+                        if SYS_BLOCK + disk['name'] not in glob.glob(SYS_BLOCK + filters[f_name]):
                             all_filters_passed = False
-
+                    elif f_name == 'model_regex':
+                        pattern = re.compile(filters[f_name])
+                        if not pattern.search(disk['model']):
+                            all_filters_passed = False
                     elif str(filters[f_name]) != disk[f_name]:
                         all_filters_passed = False
 
