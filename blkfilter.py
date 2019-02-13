@@ -4,9 +4,9 @@ import json
 import glob
 
 
-SYS_DEV = '/sys/devices'
-SYS_BLOCK = '/sys/block'
-ISCSI_TARGET_PATH = SYS_DEV + '/platform/%s/%s/%s/iscsi_connection/%s'  # host, session, connection, connection
+SYS_DEV = '/sys/devices/'
+SYS_BLOCK = '/sys/block/'
+ISCSI_TARGET_PATH = SYS_DEV + 'platform/%s/%s/%s/iscsi_connection/%s'  # host, session, connection, connection
 
 
 # list of main filters available for `lsblk`,
@@ -80,10 +80,10 @@ class BlkDeviceInfo(object):
 
                 # add target IP address and port number for iSCSI devices
                 if d['tran'] == 'iscsi':
-                    iscsi_disk_path = os.readlink(SYS_BLOCK + '/' + d['name'])
+                    iscsi_disk_path = os.readlink(SYS_BLOCK + d['name'])
                     host = iscsi_disk_path.split("/")[3]
                     session = iscsi_disk_path.split("/")[4]
-                    connection = glob.glob(SYS_DEV + '/platform/' + host +
+                    connection = glob.glob(SYS_DEV + 'platform/' + host +
                                                  '/' + session + '/connection*')[0].split('/')[-1]
 
                     with open((ISCSI_TARGET_PATH % (host, session, connection, connection)) + '/address' ) as adr:
@@ -165,7 +165,7 @@ class BlkDeviceInfo(object):
                         if disk['rota'] != rotational:
                             all_filters_passed = False
                     elif f_name == 'name':
-                        if '/sys/block/' + disk['name'] not in glob.glob('/sys/block/' + filters['name']):
+                        if SYS_BLOCK + disk['name'] not in glob.glob(SYS_BLOCK + filters['name']):
                             all_filters_passed = False
 
                     elif str(filters[f_name]) != disk[f_name]:
