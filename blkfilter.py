@@ -32,7 +32,8 @@ ISCSI_TARGET_PATH = SYS_DEV + 'platform/%s/%s/%s/iscsi_connection/%s'  # host, s
 # sometimes we would like to have a range for some parameter
 # or regex or glob instead of exact name
 # for these purposes we need to use additional filter name
-ADDITIONAL_DISK_FILTER = ['min_size', 'max_size', 'name_glob', 'model_regex', 'remote']
+ADDITIONAL_DISK_FILTER = ['min_size', 'max_size', 'name_glob', 'model_regex', 'remote',
+                          'empty', 'in_use']
 
 
 class BlkFilterPartition(object):
@@ -151,6 +152,33 @@ class BlkDeviceInfo(object):
 
         return devlist_dict['blockdevices']
 
+    @staticmethod
+    def _tree_traverse_and_apply(node, method, additional_arg_list=None):
+
+        # Preorder traversal, first check current node
+        # then all its children. I method() ruturns True, we need to stop
+        if additional_arg_list:
+            stop_result = method(node, additional_arg_list)
+        else:
+            stop_result = method(node)
+        if stop_result:
+            return stop_result
+
+        if 'children' in node:
+            for c in node['children']:
+                stop_result = BlkDeviceInfo._tree_traverse_and_apply(c, method, additional_arg_list)
+                if stop_result:
+                    return stop_result
+
+        return False
+
+
+    @staticmethod
+    def _in_use(blkdev_info_dict):
+        """Method to check if partition is mounted"""
+        if blkdev_info_dict['mountpoint'] is not None:
+            return True
+        return False
 
     def get_partition_list(self, filters):
         result = []
@@ -194,6 +222,13 @@ class BlkDeviceInfo(object):
                     elif f_name == 'model_regex':
                         pattern = re.compile(filters[f_name])
                         if not pattern.search(disk['model']):
+                            all_filters_passed = False
+                    elif f_name == 'empty':
+                        if (filters['empty'] and 'children' in disk) or (not filters['empty'] and 'children' not in disk):
+                            all_filters_passed = False
+                    elif f_name == 'in_use':
+                        disk_in_use = BlkDeviceInfo._tree_traverse_and_apply(disk, BlkDeviceInfo._in_use)
+                        if filters['in_use'] != disk_in_use:
                             all_filters_passed = False
                     elif str(filters[f_name]) != disk[f_name]:
                         all_filters_passed = False
