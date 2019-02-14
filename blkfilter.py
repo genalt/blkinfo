@@ -32,7 +32,7 @@ ISCSI_TARGET_PATH = SYS_DEV + 'platform/%s/%s/%s/iscsi_connection/%s'  # host, s
 # sometimes we would like to have a range for some parameter
 # or regex or glob instead of exact name
 # for these purposes we need to use additional filter name
-ADDITIONAL_DISK_FILTER = ['min_size', 'max_size', 'name_glob', 'model_regex']
+ADDITIONAL_DISK_FILTER = ['min_size', 'max_size', 'name_glob', 'model_regex', 'remote']
 
 
 class BlkFilterPartition(object):
@@ -80,8 +80,11 @@ class BlkDeviceInfo(object):
             # Add parameters or tune that ones returned by lsblk
             for d in devtree_dict['blockdevices']:
 
-                # add target IP address and port number for iSCSI devices
+
                 if d['tran'] == 'iscsi':
+                    d['remote'] = True
+
+                    # add target IP address and port number for iSCSI devices
                     iscsi_disk_path = os.readlink(SYS_BLOCK + d['name'])
                     host = iscsi_disk_path.split("/")[3]
                     session = iscsi_disk_path.split("/")[4]
@@ -93,13 +96,16 @@ class BlkDeviceInfo(object):
 
                     with open((ISCSI_TARGET_PATH % (host, session, connection, connection)) + '/port' ) as port:
                         d['iscsi_target_port'] = port.read().strip()
+                elif d['tran'] == 'fc':
+                    d['remote'] = True
+                else:
+                    d['remote'] = False
 
                 # FIXME: for some devices we have got vendor ID, instead of vendor name
                 # for example for nvme disc with PCIE controller
                 # to get a vendor name we need to parse 'hwdata' file.
                 # As a workaround combine vendor name and model, which usually also contains
                 # mention of vendor name
-
                 d['model'] = str(d['vendor']).strip() + ' ' + str(d['model']).strip()
                 d['vendor'] = d['model']
 
