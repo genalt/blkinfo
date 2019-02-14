@@ -58,15 +58,17 @@ class BlkDeviceInfo(object):
 
 
     def __init__(self):
-        self.blkdev_tree = BlkDeviceInfo._get_device_tree()
-        self.blkdev_rtee = BlkDeviceInfo._get_device_reversetree()
+        # this DS is used for block devices (disks) processing
+        self.blkdev_tree_list = BlkDeviceInfo._get_device_tree_list()
+
+        # these DSs are used for partitions processing
+        self.blkdev_rtree_list = BlkDeviceInfo._get_device_reversetree_list()
         self.blkdev_list = BlkDeviceInfo._get_device_list()
 
-
     @staticmethod
-    def _get_device_tree():
-        """ In general this method is used to get information about disks available in the system.
-            Information is provided in a forest view, each disk is a root of corresponding tree.
+    def _get_device_tree_list():
+        """ Method to provide information about all disks available in the system
+            in a forest view, each physical device (a disk) is a root of corresponding tree.
         """
 
         # internally lsblk uses /sys/block and /sys/devices directories to get information
@@ -79,7 +81,6 @@ class BlkDeviceInfo(object):
 
             # Add parameters or tune that ones returned by lsblk
             for d in devtree_dict['blockdevices']:
-
 
                 if d['tran'] == 'iscsi':
                     d['remote'] = True
@@ -110,14 +111,16 @@ class BlkDeviceInfo(object):
                 d['vendor'] = d['model']
 
         except (subprocess.CalledProcessError, ValueError):
-            return {}
+            return []
 
-        return devtree_dict
+        return devtree_dict['blockdevices']
 
     @staticmethod
-    def _get_device_reversetree():
-        """ In general this method is used to get information about partitions available in the system.
-            Information is provided in a forest view, each partition is a root of corresponding tree.
+    def _get_device_reversetree_list():
+        """ Method to provide information about all partitions of all disks available in the system
+            in a forest view, where each partition is a root of corresponding tree.
+            Every level of such tree contains only one leaf - parent partition of disk if this is a
+            leaf of a tree.
         """
 
         # comment from lsblk source:
@@ -131,19 +134,23 @@ class BlkDeviceInfo(object):
             devrtree_json = subprocess.check_output(['lsblk', '-i',  '-a', '-s', '-b', '-O', '-J'])
             devrtree_dict = json.loads(devrtree_json, encoding="ascii")
         except (subprocess.CalledProcessError, ValueError):
-            return {}
+            return []
 
-        return devrtree_dict
+        return devrtree_dict['blockdevices']
 
     @staticmethod
     def _get_device_list():
+        """ Method to provice a list of all devices and partitions.
+            Every element of the list is a dictionary like name -> information
+        """
         try:
             devlist_json = subprocess.check_output(['lsblk', '-i', '-l',  '-a', '-b', '-O', '-J'])
             devlist_dict = json.loads(devlist_json, encoding="ascii")
         except (subprocess.CalledProcessError, ValueError):
-            return {}
+            return []
 
-        return devlist_dict
+        return devlist_dict['blockdevices']
+
 
     def get_partition_list(self, filters):
         result = []
@@ -152,11 +159,11 @@ class BlkDeviceInfo(object):
     def get_disk_list(self, filters):
         result = []
 
-        if not self.blkdev_tree:
+        if not self.blkdev_tree_list:
             return result
 
         # iterate through all disks in the system
-        for disk in self.blkdev_tree['blockdevices']:
+        for disk in self.blkdev_tree_list:
 
             all_filters_passed = True
 
