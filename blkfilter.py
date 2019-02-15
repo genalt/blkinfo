@@ -33,7 +33,7 @@ ISCSI_TARGET_PATH = SYS_DEV + 'platform/%s/%s/%s/iscsi_connection/%s'  # host, s
 # or regex or glob instead of exact name
 # for these purposes we need to use additional filter name
 ADDITIONAL_DISK_FILTER = ['min_size', 'max_size', 'name_glob', 'model_regex', 'remote',
-                          'empty', 'in_use']
+                          'empty', 'is_mounted']
 
 
 class BlkFilterPartition(object):
@@ -93,11 +93,18 @@ class BlkDeviceInfo(object):
                     connection = glob.glob(SYS_DEV + 'platform/' + host +
                                                  '/' + session + '/connection*')[0].split('/')[-1]
 
-                    with open((ISCSI_TARGET_PATH % (host, session, connection, connection)) + '/address' ) as adr:
-                        d['iscsi_target_ipaddr'] = adr.read().strip()
+                    try:
+                        with open((ISCSI_TARGET_PATH % (host, session, connection, connection)) + '/address' ) as adr:
+                            d['iscsi_target_ipaddr'] = adr.read().strip()
+                    except IOError:
+                            d['iscsi_target_ipaddr'] = None
 
-                    with open((ISCSI_TARGET_PATH % (host, session, connection, connection)) + '/port' ) as port:
-                        d['iscsi_target_port'] = port.read().strip()
+                    try:
+                        with open((ISCSI_TARGET_PATH % (host, session, connection, connection)) + '/port' ) as port:
+                            d['iscsi_target_port'] = port.read().strip()
+                    except IOError:
+                            d['iscsi_target_port'] = None
+
                 elif d['tran'] == 'fc':
                     d['remote'] = True
                 else:
@@ -174,7 +181,7 @@ class BlkDeviceInfo(object):
 
 
     @staticmethod
-    def _in_use(blkdev_info_dict):
+    def _is_mounted(blkdev_info_dict):
         """Method to check if partition is mounted"""
         if blkdev_info_dict['mountpoint'] is not None:
             return True
@@ -226,9 +233,9 @@ class BlkDeviceInfo(object):
                     elif f_name == 'empty':
                         if (filters['empty'] and 'children' in disk) or (not filters['empty'] and 'children' not in disk):
                             all_filters_passed = False
-                    elif f_name == 'in_use':
-                        disk_in_use = BlkDeviceInfo._tree_traverse_and_apply(disk, BlkDeviceInfo._in_use)
-                        if filters['in_use'] != disk_in_use:
+                    elif f_name == 'is_mounted':
+                        disk_mounted = BlkDeviceInfo._tree_traverse_and_apply(disk, BlkDeviceInfo._is_mounted)
+                        if filters['is_mounted'] != disk_mounted:
                             all_filters_passed = False
                     elif str(filters[f_name]) != disk[f_name]:
                         all_filters_passed = False
