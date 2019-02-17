@@ -29,24 +29,15 @@ ISCSI_TARGET_PATH = SYS_DEV + 'platform/%s/%s/%s/iscsi_connection/%s'  # host, s
 #    tran:    device transport type
 #    ...
 
+DISK_FILTERS = ['name', 'kname', 'fstype', 'label', 'mountpoint', 'size', 'maj:min', 'rm',
+                'model', 'vendor', 'serial','hctl', 'tran', 'rota']
+
+
 # sometimes we would like to have a range for some parameter
 # or regex or glob instead of exact name
 # for these purposes we need to use additional filter name
 ADDITIONAL_DISK_FILTER = ['min_size', 'max_size', 'name_glob', 'model_regex', 'remote',
                           'empty', 'is_mounted']
-
-
-class BlkFilterPartition(object):
-    """Class to hold general information about a partition of a block device"""
-
-    def __init__(self):
-        self.fstype = None       # filesystem type
-        self.mountpoint = None   # where the device is mounted
-        self.label = None        # filesystem label
-        self.uuid = None         # filesystem UUID
-        self.parttype = None     # partition type UUID
-        self.partlabel = None    # partition LABEL
-        self.partuuid = None     # partition UUID
 
 
 class BlkDeviceInfo(object):
@@ -151,13 +142,20 @@ class BlkDeviceInfo(object):
         """ Method to provice a list of all devices and partitions.
             Every element of the list is a dictionary like name -> information
         """
-        try:
-            devlist_json = subprocess.check_output(['lsblk', '-i', '-l',  '-a', '-b', '-O', '-J'])
-            devlist_dict = json.loads(devlist_json, encoding="ascii")
-        except (subprocess.CalledProcessError, ValueError):
-            return []
+        lsblk_list = {}
 
-        return devlist_dict['blockdevices']
+        try:
+            filter_str = ','.join(DISK_FILTERS).upper()
+            disk_info_list = subprocess.check_output(['lsblk', '-n', '-r', '-b', '-o', filter_str])
+
+
+            for di in disk_info_list.split('\n')[:-1]:
+                params = [p.decode('string-escape').strip() for p in di.split(' ')]
+                lsblk_list[params[0]] = dict(zip(DISK_FILTERS, params))
+        except (subprocess.CalledProcessError, ValueError):
+            return {}
+
+        return lsblk_list
 
     @staticmethod
     def _tree_traverse_and_apply(node, method, additional_arg_list=None):
