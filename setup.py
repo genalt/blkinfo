@@ -11,7 +11,7 @@ setup(
     url="https://github.com/grinrag/disk_enumeration_poc",
     packages=['blkinfo'],
     package_dir={"": "src"},
-    keywords='lsblk disk blockdevice blockinfo blkinfo',
+    keywords='lsblk disk blockdevice blockinfo blkinfo iscsi',
     classifiers=[
         "Development Status :: 2 - Pre-Alpha",
         "Programming Language :: Python",
