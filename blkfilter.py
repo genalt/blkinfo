@@ -1,6 +1,5 @@
 import os
 import subprocess
-import json
 import glob
 import re
 
@@ -30,7 +29,7 @@ ISCSI_TARGET_PATH = SYS_DEV + 'platform/%s/%s/%s/iscsi_connection/%s'  # host, s
 #    ...
 
 DISK_FILTERS = ['name', 'kname', 'fstype', 'label', 'mountpoint', 'size', 'maj:min', 'rm',
-                'model', 'vendor', 'serial','hctl', 'tran', 'rota']
+                'model', 'vendor', 'serial','hctl', 'tran', 'rota', 'type']
 
 
 # sometimes we would like to have a range for some parameter
@@ -48,117 +47,105 @@ class BlkDeviceInfo(object):
         with flexible filtering options.
     """
 
-
     def __init__(self):
-        # this DS is used for block devices (disks) processing
-        self.blkdev_tree_list = BlkDeviceInfo._get_device_tree_list()
-
-        # these DSs are used for partitions processing
-        self.blkdev_rtree_list = BlkDeviceInfo._get_device_reversetree_list()
-        self.blkdev_list = BlkDeviceInfo._get_device_list()
+        self.disk_tree = BlkDeviceInfo._build_disk_tree()
+        self._add_iscsi_info(self.disk_tree)
+        self._merge_model_vendor(self.disk_tree)
 
     @staticmethod
-    def _get_device_tree_list():
-        """ Method to provide information about all disks available in the system
-            in a forest view, each physical device (a disk) is a root of corresponding tree.
-        """
-
-        # internally lsblk uses /sys/block and /sys/devices directories to get information
-        # about all disks and partitions
-        # TODO: rewrite without using lsblk utility
-
-        try:
-            devtree_json = subprocess.check_output(['lsblk', '-i', '-a', '-b', '-O', '-J'])
-            devtree_dict = json.loads(devtree_json, encoding="ascii")
-
-            # Add parameters or tune that ones returned by lsblk
-            for d in devtree_dict['blockdevices']:
-
-                if d['tran'] == 'iscsi':
-                    d['remote'] = True
-
-                    # add target IP address and port number for iSCSI devices
-                    iscsi_disk_path = os.readlink(SYS_BLOCK + d['name'])
-                    host = iscsi_disk_path.split("/")[3]
-                    session = iscsi_disk_path.split("/")[4]
-                    connection = glob.glob(SYS_DEV + 'platform/' + host +
-                                                 '/' + session + '/connection*')[0].split('/')[-1]
-
-                    try:
-                        with open((ISCSI_TARGET_PATH % (host, session, connection, connection)) + '/address' ) as adr:
-                            d['iscsi_target_ipaddr'] = adr.read().strip()
-                    except IOError:
-                            d['iscsi_target_ipaddr'] = None
-
-                    try:
-                        with open((ISCSI_TARGET_PATH % (host, session, connection, connection)) + '/port' ) as port:
-                            d['iscsi_target_port'] = port.read().strip()
-                    except IOError:
-                            d['iscsi_target_port'] = None
-
-                elif d['tran'] == 'fc':
-                    d['remote'] = True
-                else:
-                    d['remote'] = False
-
-                # FIXME: for some devices we have got vendor ID, instead of vendor name
-                # for example for nvme disc with PCIE controller
-                # to get a vendor name we need to parse 'hwdata' file.
-                # As a workaround combine vendor name and model, which usually also contains
-                # mention of vendor name
-                d['model'] = str(d['vendor']).strip() + ' ' + str(d['model']).strip()
-                d['vendor'] = d['model']
-
-        except (subprocess.CalledProcessError, ValueError):
-            return []
-
-        return devtree_dict['blockdevices']
+    def _merge_model_vendor(disk_tree):
+        # FIXME: for some devices we have got vendor ID, instead of vendor name
+        # for example for nvme disc with PCIE controller
+        # to get a vendor name we need to parse 'hwdata' file.
+        # As a workaround combine vendor name and model, which usually also contains
+        # mention of vendor name
+        for d in disk_tree:
+            disk_tree[d]['model'] = str(disk_tree[d]['vendor']).strip() + ' ' + str(disk_tree[d]['model']).strip()
+            disk_tree[d]['vendor'] = disk_tree[d]['model']
 
     @staticmethod
-    def _get_device_reversetree_list():
-        """ Method to provide information about all partitions of all disks available in the system
-            in a forest view, where each partition is a root of corresponding tree.
-            Every level of such tree contains only one leaf - parent partition of disk if this is a
-            leaf of a tree.
-        """
+    def _add_iscsi_info(disk_tree):
+        """ add target IP address and port number for iSCSI devices """
 
-        # comment from lsblk source:
-        # * The /sys/block contains only root devices, and no partitions. It seems more
-        # * simple to scan /sys/dev/block where are all devices without exceptions to get
-        # * top-level devices for the reverse tree.
-        # option '-s' for inverse tree
-        # TODO: rewrite without using lsblk utility
+        for name in disk_tree:
+            d = disk_tree[name]
+            if d['type'] != 'disk' or d['tran'] != 'iscsi':
+                continue
 
-        try:
-            devrtree_json = subprocess.check_output(['lsblk', '-i',  '-a', '-s', '-b', '-O', '-J'])
-            devrtree_dict = json.loads(devrtree_json, encoding="ascii")
-        except (subprocess.CalledProcessError, ValueError):
-            return []
+            iscsi_disk_path = os.readlink(SYS_BLOCK + d['name'])
+            host = iscsi_disk_path.split("/")[3]
+            session = iscsi_disk_path.split("/")[4]
+            connection = glob.glob(SYS_DEV + 'platform/' + host +
+                                            '/' + session + '/connection*')[0].split('/')[-1]
 
-        return devrtree_dict['blockdevices']
+            try:
+                with open((ISCSI_TARGET_PATH % (host, session, connection, connection)) + '/address' ) as adr:
+                    d['iscsi_target_ipaddr'] = adr.read().strip()
+            except IOError:
+                    d['iscsi_target_ipaddr'] = None
+
+            try:
+                with open((ISCSI_TARGET_PATH % (host, session, connection, connection)) + '/port' ) as port:
+                    d['iscsi_target_port'] = port.read().strip()
+            except IOError:
+                    d['iscsi_target_port'] = None
 
     @staticmethod
-    def _get_device_list():
-        """ Method to provice a list of all devices and partitions.
-            Every element of the list is a dictionary like name -> information
-        """
-        lsblk_list = {}
+    def _get_disk_level(lsblk_disk_line):
+        """ Helper to parse disk hierarchy returned by 'lsblk' """
+        level = 0
+        for c in lsblk_disk_line:
+            if c in ['`', '|', '-', ' ']:
+                level = level + 1
+            else:
+                break
+        return level, lsblk_disk_line[level:]
 
+    @staticmethod
+    def _build_disk_tree():
+        """ Build Block device tree and gather information
+            about all disks and partitions avaialbe in the system,
+            using 'lsblk' command line tool (provided by linux-utils)
+        """
+
+        disk_tree = {}
         try:
             filter_str = ','.join(DISK_FILTERS).upper()
-            disk_info_list = subprocess.check_output(['lsblk', '-n', '-r', '-b', '-o', filter_str])
-
+            disk_info_list = subprocess.check_output(['lsblk', '-a', '-n', '-r', '-b', '-o', filter_str])
 
             for di in disk_info_list.split('\n')[:-1]:
                 params = [p.decode('string-escape').strip() for p in di.split(' ')]
-                lsblk_list[params[0]] = dict(zip(DISK_FILTERS, params))
+                dn = params[0]  # disk name
+                disk_tree[dn] = dict(zip(DISK_FILTERS, params))
+                disk_tree[dn]['children'] = []
+                # for some devices we have empty size field,
+                # use 0 instead
+                disk_tree[dn]['size'] = disk_tree[dn]['size'] or 0
+
         except (subprocess.CalledProcessError, ValueError):
             return {}
 
-        return lsblk_list
+        disk_hierarchy = subprocess.check_output(['lsblk', '-a', '-n', '-i', '-o',  'NAME'])
+        parent_stack = []
+        for disk_line in disk_hierarchy.split('\n'):
+            level, name = BlkDeviceInfo._get_disk_level(disk_line)
 
-    @staticmethod
-    def _tree_traverse_and_apply(node, method, additional_arg_list=None):
+            while parent_stack:
+                p = parent_stack.pop()
+                if p[1] < level:
+                    disk_tree[p[0]]['children'].append(name)
+                    parent_stack.append(p)
+                    break
+
+            parent_stack.append([name, level])
+
+        return disk_tree
+
+
+    def _tree_traverse_and_apply(self, node, method, additional_arg_list=None):
+        """ Preorder traversal for device tree and applying custom method on every
+            node, until custom method returns True
+        """
 
         # Preorder traversal, first check current node
         # then all its children. I method() ruturns True, we need to stop
@@ -166,12 +153,14 @@ class BlkDeviceInfo(object):
             stop_result = method(node, additional_arg_list)
         else:
             stop_result = method(node)
+
         if stop_result:
             return stop_result
 
-        if 'children' in node:
-            for c in node['children']:
-                stop_result = BlkDeviceInfo._tree_traverse_and_apply(c, method, additional_arg_list)
+        if node['children']:
+            for child_name in node['children']:
+                child_node = self.disk_tree[child_name]
+                stop_result = BlkDeviceInfo._tree_traverse_and_apply(child_node, method, additional_arg_list)
                 if stop_result:
                     return stop_result
 
@@ -185,22 +174,19 @@ class BlkDeviceInfo(object):
             return True
         return False
 
-    def get_partition_list(self, filters):
-        result = []
-        return result
 
     def get_disk_list(self, filters):
         result = []
-
-        if not self.blkdev_tree_list:
+        if not self.disk_tree:
             return result
 
         # iterate through all disks in the system
-        for disk in self.blkdev_tree_list:
+        for dn in self.disk_tree:
+            disk = self.disk_tree[dn]
+            if disk['type'] != 'disk':
+                continue
 
             all_filters_passed = True
-
-            disk['size'] = disk['size'] or 0
 
             print(disk['name'])
 
@@ -232,7 +218,7 @@ class BlkDeviceInfo(object):
                         if (filters['empty'] and 'children' in disk) or (not filters['empty'] and 'children' not in disk):
                             all_filters_passed = False
                     elif f_name == 'is_mounted':
-                        disk_mounted = BlkDeviceInfo._tree_traverse_and_apply(disk, BlkDeviceInfo._is_mounted)
+                        disk_mounted = self._tree_traverse_and_apply(disk, BlkDeviceInfo._is_mounted)
                         if filters['is_mounted'] != disk_mounted:
                             all_filters_passed = False
                     elif str(filters[f_name]) != disk[f_name]:
@@ -240,6 +226,7 @@ class BlkDeviceInfo(object):
 
             if all_filters_passed:
                 print("add current disk into result")
+                result.append(disk)
             else:
                 print("ignore current disk")
         return result
