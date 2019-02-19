@@ -39,7 +39,7 @@ DISK_FILTERS = ['name', 'kname', 'fstype', 'label', 'mountpoint', 'size', 'maj:m
 ADDITIONAL_DISK_FILTER = ['min_size', 'max_size', 'name_glob', 'model_regex', 'remote',
                           'empty', 'is_mounted']
 
-DISK_TYPES = ['disk', 'rom']
+DISK_TYPES = ['disk', 'rom', 'mpath']
 
 class BlkDeviceInfo(object):
     """ BlkDeviceInfo is a class to provide basic information about:
