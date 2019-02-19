@@ -29,7 +29,8 @@ ISCSI_TARGET_PATH = SYS_DEV + 'platform/%s/%s/%s/iscsi_connection/%s'  # host, s
 #    ...
 
 DISK_FILTERS = ['name', 'kname', 'fstype', 'label', 'mountpoint', 'size', 'maj:min', 'rm',
-                'model', 'vendor', 'serial','hctl', 'tran', 'rota', 'type']
+                'model', 'vendor', 'serial','hctl', 'tran', 'rota', 'type', 'ro', 'owner',
+                'group', 'mode']
 
 
 # sometimes we would like to have a range for some parameter
@@ -38,6 +39,7 @@ DISK_FILTERS = ['name', 'kname', 'fstype', 'label', 'mountpoint', 'size', 'maj:m
 ADDITIONAL_DISK_FILTER = ['min_size', 'max_size', 'name_glob', 'model_regex', 'remote',
                           'empty', 'is_mounted']
 
+DISK_TYPES = ['disk', 'rom']
 
 class BlkDeviceInfo(object):
     """ BlkDeviceInfo is a class to provide basic information about:
@@ -183,12 +185,10 @@ class BlkDeviceInfo(object):
         # iterate through all disks in the system
         for dn in self.disk_tree:
             disk = self.disk_tree[dn]
-            if disk['type'] != 'disk':
+            if disk['type'] not in DISK_TYPES:
                 continue
 
             all_filters_passed = True
-
-            print(disk['name'])
 
             for f_name in filters:
                 if not all_filters_passed:
@@ -225,8 +225,5 @@ class BlkDeviceInfo(object):
                         all_filters_passed = False
 
             if all_filters_passed:
-                print("add current disk into result")
                 result.append(disk)
-            else:
-                print("ignore current disk")
         return result
