@@ -3,7 +3,7 @@ from setuptools import setup
 
 setup(
     name="blkinfo",
-    version="0.0.1",
+    version="0.0.2",
     author="Gennadii Altukhov",
     author_email="galt@redhat.com",
     description="Library for listing all block devices available in the system using additional filters",
