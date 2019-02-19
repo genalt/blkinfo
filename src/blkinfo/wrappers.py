@@ -116,8 +116,8 @@ class LsBlkWrapper(object):
             filter_str = ','.join(DISK_FILTERS).upper()
             disk_info_list = subprocess.check_output(['lsblk', '-a', '-n', '-r', '-b', '-o', filter_str])
 
-            for di in disk_info_list.split('\n')[:-1]:
-                params = [p.decode('string-escape').strip() for p in di.split(' ')]
+            for di in disk_info_list.split(b'\n')[:-1]:
+                params = [p.decode("unicode_escape").strip() for p in di.split(b' ')]
                 dn = params[0]  # disk name
                 disk_tree[dn] = dict(zip(DISK_FILTERS, params))
                 disk_tree[dn]['children'] = []
@@ -130,7 +130,7 @@ class LsBlkWrapper(object):
 
         disk_hierarchy = subprocess.check_output(['lsblk', '-a', '-n', '-i', '-o',  'NAME'])
         parent_stack = []
-        for disk_line in disk_hierarchy.split('\n'):
+        for disk_line in disk_hierarchy.split(b'\n'):
             level, name = LsBlkWrapper._get_disk_level(disk_line)
 
             while parent_stack:
