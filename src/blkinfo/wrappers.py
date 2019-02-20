@@ -45,7 +45,7 @@ DISK_TYPES = ['disk', 'rom', 'mpath']
 
 
 class LsBlkWrapper(object):
-    """ LsBlkWrapper is a wrapper for lsblk command line tool provided by linux-utils
+    """ LsBlkWrapper is a wrapper for 'lsblk' command line tool provided by util-linux
         It parses output of lsblk, builds block devices hierarchy in the system,
         fills self.disk_info with different block device information
     """
@@ -107,8 +107,7 @@ class LsBlkWrapper(object):
     @staticmethod
     def _build_disk_tree():
         """ Build Block device tree and gather information
-            about all disks and partitions avaialbe in the system,
-            using 'lsblk' command line tool (provided by linux-utils)
+            about all disks and partitions avaialbe in the system
         """
 
         disk_tree = {}
@@ -128,6 +127,7 @@ class LsBlkWrapper(object):
         except (subprocess.CalledProcessError, ValueError):
             return {}
 
+        # parse output of lsblk to build tree hierarchy
         disk_hierarchy = subprocess.check_output(['lsblk', '-a', '-n', '-i', '-o',  'NAME'])
         parent_stack = []
         for disk_line in disk_hierarchy.split(b'\n'):
