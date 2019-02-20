@@ -4,11 +4,11 @@
 
 blkinfo is a python package to list information about all available or the specified block devices.
 
-It bases on `lsblk` command line tool, provided by `util-linux`, in addition it collects information about block
+It bases on `lsblk` command line tool, provided by `util-linux`, in addition, it collects information about block
 devices, using `/sys/block`, `/sys/devices`, `/proc` directories.
 
-The main goal is to provide Python's binding to `lsblk`. Old verstions of `lsblk`, provided by `util-linux-2.23.2` on
-Red Hat Interprise Linux 7 and Centos 7 (and earlier versions) do not contain option to output to JSON format.
+The main goal is to provide Python's binding to `lsblk`. Old versions of `lsblk`, provided by `util-linux-2.23.2` on
+Red Hat Enterprise Linux 7 and Centos 7 (and earlier versions) do not contain an option to output to JSON format.
 
 Additional features to `lsblk`:
 

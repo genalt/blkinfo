@@ -15,7 +15,7 @@ setup(
     long_description=long_description,
     long_description_content_type='text/markdown',
     license="GPLv3",
-    url="https://github.com/grinrag/disk_enumeration_poc",
+    url="https://github.com/grinrag/blkinfo",
     packages=['blkinfo'],
     package_dir={"": "src"},
     keywords='lsblk disk blockdevice blockinfo blkinfo iscsi',
