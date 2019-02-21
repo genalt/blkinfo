@@ -2,12 +2,11 @@ import os
 import glob
 import subprocess
 
-
+from errors import NoLsblkFound
 
 SYS_DEV = '/sys/devices/'
 SYS_BLOCK = '/sys/block/'
 ISCSI_TARGET_PATH = SYS_DEV + 'platform/%s/%s/%s/iscsi_connection/%s'  # host, session, connection, connection
-
 
 # list of main filters available for `lsblk`,
 # see docs of lsblk for more details
@@ -51,7 +50,11 @@ class LsBlkWrapper(object):
     """
 
     def __init__(self):
-        self.disk_tree = LsBlkWrapper._build_disk_tree()
+        try:
+            self.disk_tree = LsBlkWrapper._build_disk_tree()
+        except OSError:
+            raise NoLsblkFound('lsblk command-line tool from util-linux package is not found.')
+
         self._add_iscsi_info(self.disk_tree)
         self._merge_model_vendor(self.disk_tree)
 
