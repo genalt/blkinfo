@@ -6,9 +6,12 @@ this_directory = path.abspath(path.dirname(__file__))
 with open(path.join(this_directory, 'README.md'), encoding='utf-8') as f:
     long_description = f.read()
 
+with open(path.join(this_directory, 'version'), encoding='utf-8') as f:
+    latest_ver = f.read()
+
 setup(
     name="blkinfo",
-    version="0.0.4",
+    version=latest_ver,
     author="Gennadii Altukhov",
     author_email="galt@redhat.com",
     description="blkinfo is a python package to list information about all available or the specified block devices.",
