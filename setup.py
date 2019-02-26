@@ -28,5 +28,5 @@ setup(
         "Programming Language :: Python :: 3",
         "Topic :: Software Development :: Libraries :: Python Modules"
     ],
-    data_files = [("", ["LICENSE"])]
+    data_files = [("", ["LICENSE", "version"])]
 )
