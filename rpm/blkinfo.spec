@@ -5,33 +5,44 @@
 ####
 #### At this point you can use rpmbuild -ba blkinfo.spec
 #### (this is because our Source0 is a remote source)
+%global pypi_name blkinfo
 
-%global srcname blkinfo
-
-Name:           python-%{srcname}
-Version:        0.0.5
+Name:           python-%{pypi_name}
+Version:        0.0.7
 Release:        1%{?dist}
-Summary:        Example python module
+Summary:        blkinfo is a python package to list information about all available or the specified block devices
 
-License:        MIT
-URL:            https://pypi.python.org/pypi/example
-Source0:        %{pypi_source}
-
+License:        GPLv3
+URL:            https://github.com/grinrag/blkinfo
+Source0:        https://files.pythonhosted.org/packages/source/b/%{pypi_name}/%{pypi_name}-%{version}.tar.gz
 BuildArch:      noarch
+ 
+BuildRequires:  python3-devel
+BuildRequires:  python3dist(setuptools)
 
 %description
-An python module which provides a convenient example.
+ Block Devices Information Aboutblkinfo is a python package to list information
+about all available or the specified block devices.It bases on lsblk command
+line tool, provided by util-linux, in addition, it collects information about
+block devices, using /sys/block, /sys/devices, /proc directories.The main goal
+is to provide Python's binding to lsblk. Old versions of lsblk, provided by...
 
-%package -n python3-%{srcname}
+%package -n     python3-%{pypi_name}
 Summary:        %{summary}
-BuildRequires:  python3-devel
-%{?python_provide:%python_provide python3-%{srcname}}
+Provides: python3dist(%{pypi_name})
 
-%description -n python3-%{srcname}
-An python module which provides a convenient example.
+%description -n python3-%{pypi_name}
+ Block Devices Information Aboutblkinfo is a python package to list information
+about all available or the specified block devices.It bases on lsblk command
+line tool, provided by util-linux, in addition, it collects information about
+block devices, using /sys/block, /sys/devices, /proc directories.The main goal
+is to provide Python's binding to lsblk. Old versions of lsblk, provided by...
+
 
 %prep
-%autosetup -n %{srcname}-%{version}
+%autosetup -n %{pypi_name}-%{version}
+# Remove bundled egg-info
+rm -rf %{pypi_name}.egg-info
 
 %build
 %py3_build
@@ -39,11 +50,8 @@ An python module which provides a convenient example.
 %install
 %py3_install
 
-%check
-%{__python3} setup.py test
-
-# Note that there is no %%files section for the unversioned python module
-%files -n python3-%{srcname}
+%files -n python3-%{pypi_name}
+%license LICENSE
 %doc README.md
-%{python3_sitelib}/%{srcname}-*.egg-info/
-%{python3_sitelib}/%{srcname}/
+%{python3_sitelib}/%{pypi_name}
+%{python3_sitelib}/%{pypi_name}-%{version}-py?.?.egg-info
