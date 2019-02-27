@@ -8,7 +8,7 @@ with open(path.join(this_directory, 'README.md'), encoding='utf-8') as f:
 
 setup(
     name="blkinfo",
-    version="0.0.6",
+    version="0.0.7",
     author="Gennadii Altukhov",
     author_email="galt@redhat.com",
     description="blkinfo is a python package to list information about all available or the specified block devices.",
@@ -24,6 +24,5 @@ setup(
         "Programming Language :: Python",
         "Programming Language :: Python :: 3",
         "Topic :: Software Development :: Libraries :: Python Modules"
-    ],
-    data_files = [("", ["LICENSE"])]
+    ]
 )
