@@ -9,7 +9,7 @@
 %global srcname blkinfo
 
 Name:           python-%{srcname}
-Version:        %(cat version)
+Version:        0.0.5
 Release:        1%{?dist}
 Summary:        Example python module
 
