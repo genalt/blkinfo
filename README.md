@@ -1,8 +1,10 @@
-# Block Devices Information
+# blkinfo - Block Devices Information
 
-## About
+## Library
 
-blkinfo is a python package to list information about all available or the specified block devices.
+### About
+
+blkinfo is a python library to list information about all available or the specified block devices.
 
 It bases on `lsblk` command line tool, provided by `util-linux`, in addition, it collects information about block
 devices, using `/sys/block`, `/sys/devices`, `/proc` directories.
@@ -15,17 +17,29 @@ Additional features to `lsblk`:
 - information about iSCSI target IP address and port number was added
 - block device usage statistics
 
-## Installation
+### Installation
 
-Install package from PyPI repository using `pip` util
+Install python's package from PyPI repository using `pip` util:
 
 ```
 pip3 install blkinfo
+
+pip install blkinfo
 ```
 
 
+Install rpm package from Copr.
 
-## Usage example
+```
+dnf copr enable galt/blkinfo
+
+dnf install python2-blkinfo
+
+dnf install python3-blkinfo
+```
+
+
+### Usage example
 
 
 Information about all available block devices:
@@ -52,7 +66,7 @@ Passing filters as an argument to the get_disk_list() method:
 ```
 
 
-## Filters
+### Filters
 
 
 -    name:      device name
@@ -75,7 +89,3 @@ Passing filters as an argument to the get_disk_list() method:
 -    iscsi_target_ip:      used together with 'tran': 'iscsi'
 -    iscsi_target_port:    used together with 'tran': 'iscsi'
 -    is_mounted:           does a disk have mounted partion
-
-
-
-
