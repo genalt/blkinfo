@@ -3,6 +3,7 @@ import glob
 import subprocess
 
 from .errors import NoLsblkFound
+from .diskstats import get_disk_stats
 
 SYS_DEV = '/sys/devices/'
 SYS_BLOCK = '/sys/block/'
@@ -55,8 +56,18 @@ class LsBlkWrapper(object):
         except OSError:
             raise NoLsblkFound('lsblk command-line tool from util-linux package is not found.')
 
-        self._add_iscsi_info(self.disk_tree)
-        self._merge_model_vendor(self.disk_tree)
+        LsBlkWrapper._add_iscsi_info(self.disk_tree)
+        LsBlkWrapper._merge_model_vendor(self.disk_tree)
+        LsBlkWrapper._add_disk_stats(self.disk_tree)
+
+    @staticmethod
+    def _add_disk_stats(disk_tree):
+        procfs_diskstats = get_disk_stats()
+
+        for disk_name in disk_tree:
+            kname = disk_tree[disk_name]['kname']
+            if kname in procfs_diskstats:
+                disk_tree[disk_name]['statistics'] = procfs_diskstats[kname]
 
     @staticmethod
     def _merge_model_vendor(disk_tree):
