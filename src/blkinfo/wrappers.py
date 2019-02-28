@@ -2,7 +2,7 @@ import os
 import glob
 import subprocess
 
-from errors import NoLsblkFound
+from .errors import NoLsblkFound
 
 SYS_DEV = '/sys/devices/'
 SYS_BLOCK = '/sys/block/'

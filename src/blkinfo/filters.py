@@ -1,7 +1,7 @@
 import glob
 import re
 
-from wrappers import LsBlkWrapper, DISK_TYPES, DISK_FILTERS, ADDITIONAL_DISK_FILTER, SYS_BLOCK
+from .wrappers import LsBlkWrapper, DISK_TYPES, DISK_FILTERS, ADDITIONAL_DISK_FILTER, SYS_BLOCK
 
 
 class BlkDiskInfo(LsBlkWrapper):
