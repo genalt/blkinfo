@@ -22,26 +22,30 @@ class ServiceRequestHandler(varlink.RequestHandler):
     service = service
 
 
-class ActionFailed(varlink.VarlinkError):
+class GetDisksError(varlink.VarlinkError):
 
     def __init__(self, reason):
         varlink.VarlinkError.__init__(self,
-                                      {'error': 'org.example.more.ActionFailed',
+                                      {'error': 'com.redhat.blkinfo.ActionFailed',
                                        'parameters': {'field': reason}})
 
 @service.interface('com.redhat.blkinfo')
 class BlkinfoVarlink(object):
-    def GetDisksJson(self, filters_json=None):
-        blkinfo = BlkDiskInfo()
+    def GetDisksJsonFilters(self, json_filters):
+
+        try:
+            blkinfo = BlkDiskInfo()
+        except NoLsblkFound as e:
+            raise GetDisksError(str(e))
 
         filters = None
-        if filters_json and filters_json != '':
-            filters = json.loads(filters_json)
+        if json_filters and json_filters != '':
+            filters = json.loads(json_filters)
 
         system_disks = blkinfo.get_disk_list(filters)
         json_output = json.dumps(system_disks)
 
-        return {'disks_json': json_output}
+        return {'json_disks': json_output}
 
 
     def StopServing(self, _request=None, _server=None):
