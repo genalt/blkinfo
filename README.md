@@ -65,8 +65,44 @@ Passing filters as an argument to the get_disk_list() method:
    print(json_output)
 ```
 
+## Service
 
-### Filters
+There is also varlink service available. To run the service:
+
+```
+cd  ./src/varlink/
+python3 blkinfo_server.py --varlink="unix:@blkinfo"
+```
+
+
+There are some scripts in the ./src/varlink/examples directory, with
+examples of how to user varlink service.
+
+
+Also command line tool `varlink` is available from `rawhide` repository (Fedora 30 currently).
+To install:
+
+```
+sudo dnf install fedora-repos-rawhide -y
+sudo dnf install --enablerepo rawhide python3-varlink libvarlink-util
+```
+
+
+Then `varlink` cli tool can be used to call blkinfo methods:
+
+```
+varlink call unix:@blkinfo/com.redhat.blkinfo.GetDisksJsonFilters '{"json_filters": "<JSON_STRING>"}'
+```
+
+where JSON_STRING is a filtes formatted as JSON. For example to pass `name` parameters:
+
+```
+varlink call unix:@blkinfo/com.redhat.blkinfo.GetDisksJsonFilters '{"json_filters": "{\"name\": \"sda\"}" }'
+```
+
+
+
+## Filters
 
 
 -    name:      device name
