@@ -2,8 +2,7 @@
 interface com.redhat.blkinfo
 
 # Returns a list of block devices in the system after applying filters
-method GetDisksJsonFilters(json_filters: ?string) -> (json_disks: string)
-
+method GetDisksJsonFilters(json_filters: ?string) -> (blk_devices: string)
 
 # Something failed in GetDisksJsonFilters
 error GetDisksError (reason: string)

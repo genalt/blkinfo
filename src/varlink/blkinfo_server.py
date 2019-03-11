@@ -31,7 +31,7 @@ class GetDisksError(varlink.VarlinkError):
 
 @service.interface('com.redhat.blkinfo')
 class BlkinfoVarlink(object):
-    def GetDisksJsonFilters(self, json_filters):
+    def GetDisksJsonFilters(self, json_filters=None):
 
         try:
             blkinfo = BlkDiskInfo()
