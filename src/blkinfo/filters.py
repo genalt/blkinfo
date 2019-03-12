@@ -56,6 +56,12 @@ class BlkDiskInfo(LsBlkWrapper):
                         disk_mounted = self._tree_traverse_and_apply(disk, LsBlkWrapper._is_mounted)
                         if filters['is_mounted'] != disk_mounted:
                             all_filters_passed = False
+                    elif f_name == 'ro':
+                        if (filters['ro'] and disk['ro'] == '0') or (not filters['ro'] and disk['ro'] == '1'):
+                            all_filters_passed = False
+                    elif f_name == 'rm':
+                        if (filters['rm'] and disk['rm'] == '0') or (not filters['rm'] and disk['rm'] == '1'):
+                            all_filters_passed = False
                     elif str(filters[f_name]) != disk[f_name]:
                         all_filters_passed = False
 
