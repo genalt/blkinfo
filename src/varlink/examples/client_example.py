@@ -24,8 +24,6 @@ def run_client(address):
                 'min_size': 200
             }
 
-            print(json.dumps(filters))
-
             ret = con.GetDisksJsonFilters(json.dumps(filters))
             print(ret.blk_devices)
     except varlink.ConnectionError as e:

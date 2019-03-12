@@ -91,15 +91,9 @@ sudo dnf install --enablerepo rawhide python3-varlink libvarlink-util
 Then `varlink` cli tool can be used to call blkinfo methods:
 
 ```
-varlink call unix:@blkinfo/com.redhat.blkinfo.GetDisksJsonFilters '{"json_filters": "<JSON_STRING>"}'
-```
-
-where JSON_STRING is a filtes formatted as JSON. For example to pass `name` parameters:
+varlink call unix:@blkinfo/com.redhat.blkinfo.GetDisks '{"filters": {"name": "sda"}}'
 
 ```
-varlink call unix:@blkinfo/com.redhat.blkinfo.GetDisksJsonFilters '{"json_filters": "{\"name\": \"sda\"}" }'
-```
-
 
 
 ## Filters

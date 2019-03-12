@@ -1,8 +1,32 @@
 # Blockinfo Varlink service
 interface com.redhat.blkinfo
 
+type DiskFilters (
+    name: ?string,
+    name_glob: ?string,
+    kname: ?string,
+    size: ?int,
+    min_size: ?int,
+    max_size: ?int,
+    maj_min: ?string,
+    ro: ?bool,
+    rm: ?bool,
+    model: ?string,
+    serial: ?string,
+    hctl: ?string,
+    rota: ?bool,
+    tran: ?string,
+    iscsi_target_ip: ?string,
+    iscsi_target_port: ?string,
+    is_mounted: ?bool
+)
+
 # Returns a list of block devices in the system after applying filters
 method GetDisksJsonFilters(json_filters: ?string) -> (blk_devices: string)
+
+
+# Returns a list of all block devices in the system
+method GetDisks(filters: ?DiskFilters) -> (blk_devices: string)
 
 # Something failed in GetDisksJsonFilters
 error GetDisksError (reason: string)
