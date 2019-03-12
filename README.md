@@ -65,18 +65,18 @@ Passing filters as an argument to the get_disk_list() method:
    print(json_output)
 ```
 
-## Service
+## Varslink Service
 
 There is also varlink service available. To run the service:
 
 ```
 cd  ./src/varlink/
-python3 blkinfo_server.py --varlink="unix:@blkinfo"
+python3 blkinfo_server.py --varlink="unix:@blkinfo"&
 ```
 
 
 There are some scripts in the ./src/varlink/examples directory, with
-examples of how to user varlink service.
+examples of how to use the varlink service.
 
 
 Also command line tool `varlink` is available from `rawhide` repository (Fedora 30 currently).
