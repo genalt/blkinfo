@@ -24,7 +24,9 @@ def run_client(address):
                 'min_size': 200
             }
 
-            ret = con.GetDisksJsonFilters(json.dumps(filters))
+            fields = ['serial', 'name', 'model']
+
+            ret = con.GetDisksJsonFilters(json.dumps(filters), fields)
             print(ret.blk_devices)
     except varlink.ConnectionError as e:
         print("ConnectionError:", e)

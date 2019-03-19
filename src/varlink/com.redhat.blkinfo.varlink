@@ -22,11 +22,11 @@ type DiskFilters (
 )
 
 # Returns a list of block devices in the system after applying filters
-method GetDisksJsonFilters(json_filters: ?string) -> (blk_devices: string)
+method GetDisksJsonFilters(json_filters: ?string, fields: ?[]string) -> (blk_devices: string)
 
 
 # Returns a list of all block devices in the system
-method GetDisks(filters: ?DiskFilters) -> (blk_devices: string)
+method GetDisks(filters: ?DiskFilters, fields: ?[]string) -> (blk_devices: string)
 
 # Something failed in GetDisksJsonFilters
 error GetDisksError (reason: string)

@@ -31,20 +31,31 @@ class GetDisksError(varlink.VarlinkError):
 
 @service.interface('com.redhat.blkinfo')
 class BlkinfoVarlink(object):
-    def GetDisksJsonFilters(self, json_filters=None):
+    def GetDisksJsonFilters(self, json_filters=None, fields=None):
         filters = None
         if json_filters and json_filters != '':
             filters = json.loads(json_filters)
-        return  self.GetDisks(filters)
+        return  self.GetDisks(filters, fields)
 
 
-    def GetDisks(self, filters=None):
+    def GetDisks(self, filters=None, fields=None):
         try:
             blkinfo = BlkDiskInfo()
         except NoLsblkFound as e:
             raise GetDisksError(str(e))
 
         system_disks = blkinfo.get_disk_list(filters)
+
+        if fields:
+            result_fields = []
+            for d in system_disks:
+                new_d = {}
+                for f in d.keys():
+                    if f in fields:
+                        new_d[f] = d[f]
+                result_fields.append(new_d)
+            system_disks = result_fields
+
         json_output = json.dumps(system_disks)
 
         return {'blk_devices': json_output}
