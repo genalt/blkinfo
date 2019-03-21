@@ -52,13 +52,13 @@ class LsBlkWrapper(object):
 
     def __init__(self):
         try:
-            self.disk_tree = LsBlkWrapper._build_disk_tree()
+            self._disks = LsBlkWrapper._build_disk_tree()
         except OSError:
             raise NoLsblkFound('lsblk command-line tool from util-linux package is not found.')
 
-        LsBlkWrapper._add_iscsi_info(self.disk_tree)
-        LsBlkWrapper._merge_model_vendor(self.disk_tree)
-        LsBlkWrapper._add_disk_stats(self.disk_tree)
+        LsBlkWrapper._add_iscsi_info(self._disks)
+        LsBlkWrapper._merge_model_vendor(self._disks)
+        LsBlkWrapper._add_disk_stats(self._disks)
 
     @staticmethod
     def _add_disk_stats(disk_tree):
@@ -176,7 +176,7 @@ class LsBlkWrapper(object):
 
         if node['children']:
             for child_name in node['children']:
-                child_node = self.disk_tree[child_name]
+                child_node = self._disks[child_name]
                 stop_result = LsBlkWrapper._tree_traverse_and_apply(child_node, method, additional_arg_list)
                 if stop_result:
                     return stop_result

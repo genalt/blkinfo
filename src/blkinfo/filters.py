@@ -9,17 +9,17 @@ class BlkDiskInfo(LsBlkWrapper):
         disks available in the system and different parameters related to block devices
     """
 
-    def get_disk_list(self, filters=None):
+    def get_disks(self, filters=None):
         result = []
-        if not self.disk_tree:
+        if not self._disks:
             return result
 
         if not filters:
             filters = []
 
         # iterate through all disks in the system
-        for dn in self.disk_tree:
-            disk = self.disk_tree[dn]
+        for dn in self._disks:
+            disk = self._disks[dn]
             if disk['type'] not in DISK_TYPES:
                 continue
 
