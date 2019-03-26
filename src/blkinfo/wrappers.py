@@ -142,9 +142,9 @@ class LsBlkWrapper(object):
             return {}
 
         # parse output of lsblk to build tree hierarchy
-        disk_hierarchy = subprocess.check_output(['lsblk', '-a', '-n', '-i', '-o',  'NAME'])
+        disk_hierarchy = subprocess.check_output(['lsblk', '-a', '-n', '-i', '-o',  'NAME']).decode('UTF-8')
         parent_stack = []
-        for disk_line in disk_hierarchy.split(b'\n'):
+        for disk_line in disk_hierarchy.split('\n'):
             level, name = LsBlkWrapper._get_disk_level(disk_line)
 
             while parent_stack:

@@ -17,11 +17,25 @@ class BlkDiskInfo(LsBlkWrapper):
         if not filters:
             filters = []
 
+        raid_added = set()
+
         # iterate through all disks in the system
         for dn in self._disks:
             disk = self._disks[dn]
             if disk['type'] not in DISK_TYPES:
                 continue
+
+            if 'show_raid' in filters and filters['show_raid']:
+                if len(disk['children']) == 1:
+                    child_name = disk['children'][0]
+                    if child_name in raid_added:
+                        continue
+                    child_type = self._disks[child_name]['type']
+
+                    # child is raid
+                    if child_type.startswith('raid'):
+                        disk = self._disks[child_name] # show raid info instead of parent disk
+                        raid_added.add(child_name)
 
             all_filters_passed = True
 
