@@ -134,6 +134,7 @@ class LsBlkWrapper(object):
                 dn = params[0]  # disk name
                 disk_tree[dn] = dict(zip(DISK_FILTERS, params))
                 disk_tree[dn]['children'] = []
+                disk_tree[dn]['parents'] = []
                 # for some devices we have empty size field,
                 # use 0 instead
                 disk_tree[dn]['size'] = disk_tree[dn]['size'] or 0
@@ -151,6 +152,7 @@ class LsBlkWrapper(object):
                 p = parent_stack.pop()
                 if p[1] < level:
                     disk_tree[p[0]]['children'].append(name)
+                    disk_tree[name]['parents'].append(p[0])
                     parent_stack.append(p)
                     break
 
