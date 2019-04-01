@@ -17,25 +17,49 @@ class BlkDiskInfo(LsBlkWrapper):
         if not filters:
             filters = []
 
-        raid_added = set()
+        blacklist = set()
+
+        # preprocess multipath and raid devices
+        for dn in self._disks:
+            if self._disks[dn]['type'] == 'mpath':
+                for p in self._disks[dn]['parents']:
+                    # show only multipath disk itself, ignore parents
+                    blacklist.add(p)
+            elif self._disks[dn]['type'].startswith('raid'):
+
+                # if raid is assembled with parents w/o partitions
+                # we should show only raid and ignore all parents
+                ignore_parents = True
+
+                for p in self._disks[dn]['parents']:
+                    if len(self._disks[p]['children']) != 1:
+                        ignore_parents = False
+                        break
+
+                if ignore_parents:
+                    for p in self._disks[dn]['parents']:
+                        blacklist.add(p)
+
+        raids = set()
+        mpaths = set()
 
         # iterate through all disks in the system
         for dn in self._disks:
             disk = self._disks[dn]
-            if disk['type'] not in DISK_TYPES:
+            if (disk['type'] not in DISK_TYPES) and (not disk['type'].startswith('raid')) or dn in blacklist:
                 continue
 
-            if 'show_raid' in filters and filters['show_raid']:
-                if len(disk['children']) == 1:
-                    child_name = disk['children'][0]
-                    if child_name in raid_added:
-                        continue
-                    child_type = self._disks[child_name]['type']
+            if disk['type'].startswith('raid'):
+                if disk['name'] not in raids:
+                    raids.add(disk['name'])
+                else:
+                    continue
 
-                    # child is raid
-                    if child_type.startswith('raid'):
-                        disk = self._disks[child_name] # show raid info instead of parent disk
-                        raid_added.add(child_name)
+            if disk['type'] == 'mpath':
+                if disk['name'] not in mpaths:
+                    mpaths.add(disk['name'])
+                else:
+                    continue
 
             all_filters_passed = True
 
