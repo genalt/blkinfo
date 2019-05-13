@@ -1,4 +1,4 @@
-Name:           python-varlink
+Name:           python-blkinfo-varlink
 Version: 	30.1.2
 Release:        1%{?dist}
 Summary:        Python implementation of Varlink
@@ -14,11 +14,11 @@ An python module for Varlink with client and server support.
 
 %description %_description
 
-%package -n python3-varlink
+%package -n python3-blkinfo-varlink
 Summary:       %summary
-%{?python_provide:%python_provide python3-varlink}
+%{?python_provide:%python_provide python3-blkinfo-varlink}
 
-%description -n python3-varlink %_description
+%description -n python3-blkinfo-varlink %_description
 
 %prep
 %autosetup -n python-%{version}
@@ -32,7 +32,7 @@ CFLAGS="%{optflags}" %{__python3} %{py_setup} %{?py_setup_args} check
 %install
 %py3_install
 
-%files -n python3-varlink
+%files -n python3-blkinfo-varlink
 %license LICENSE.txt
 %doc README.md
 %{python3_sitelib}/*
