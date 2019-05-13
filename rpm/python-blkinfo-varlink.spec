@@ -1,10 +1,10 @@
 Name:           python-blkinfo-varlink
 Version: 	30.1.2
 Release:        1%{?dist}
-Summary:        Python implementation of Varlink
+Summary:        Python implementation of Varlink for blkinfo interface
 License:        ASL 2.0
-URL:            https://github.com/varlink/%{name}
-Source0:        https://github.com/varlink/%{name}/archive/%{version}/%{name}-%{version}.tar.gz
+URL:            https://github.com/varlink/python-varlink
+Source0:        https://github.com/varlink/python-varlink/archive/%{version}/python-varlink-%{version}.tar.gz
 BuildArch:      noarch
 BuildRequires:  python3-devel
 BuildRequires:  python3-rpm-macros
