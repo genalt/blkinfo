@@ -1,4 +1,8 @@
 #!/usr/bin/env python3
+"""
+Disk enumeration/filtering proof of concept as
+a varlink service
+"""
 
 import getopt
 import os
@@ -31,20 +35,13 @@ class GetDisksError(varlink.VarlinkError):
 
 @service.interface('com.redhat.blkinfo')
 class BlkinfoVarlink(object):
-    def GetDisksJsonFilters(self, json_filters=None, fields=None):
-        filters = None
-        if json_filters and json_filters != '':
-            filters = json.loads(json_filters)
-        return  self.GetDisks(filters, fields)
-
-
     def GetDisks(self, filters=None, fields=None):
         try:
-            blkinfo = BlkDiskInfo()
+            disk_info = BlkDiskInfo()
         except NoLsblkFound as e:
             raise GetDisksError(str(e))
 
-        system_disks = blkinfo.get_disk_list(filters)
+        system_disks = disk_info.get_disks(filters)
 
         if fields:
             result_fields = []
@@ -58,7 +55,7 @@ class BlkinfoVarlink(object):
 
         json_output = json.dumps(system_disks)
 
-        return {'blk_devices': json_output}
+        return {'blk_devices_json': json_output}
 
 
     def StopServing(self, _request=None, _server=None):
@@ -89,6 +86,7 @@ def usage():
     print('Usage: %s --varlink=<unix socket path>' % sys.argv[0], file=sys.stderr)
     print('\tSelf Exec: $ %s' % sys.argv[0], file=sys.stderr)
     print('\tServer   : $ %s --varlink=<unix socket path>' % sys.argv[0], file=sys.stderr)
+    print('\tExample: $ %s --varlink="unix:@blkinfo"' % sys.argv[0], file=sys.stderr)
 
 
 if __name__ == '__main__':

@@ -21,12 +21,8 @@ type DiskFilters (
     is_mounted: ?bool
 )
 
-# Returns a list of block devices in the system after applying filters
-method GetDisksJsonFilters(json_filters: ?string, fields: ?[]string) -> (blk_devices: string)
-
-
 # Returns a list of all block devices in the system
-method GetDisks(filters: ?DiskFilters, fields: ?[]string) -> (blk_devices: string)
+method GetDisks(filters: ?DiskFilters, fields: ?[]string) -> (blk_devices_json: string)
 
 # Something failed in GetDisksJsonFilters
 error GetDisksError (reason: string)
