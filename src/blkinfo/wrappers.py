@@ -42,8 +42,6 @@ ADDITIONAL_DISK_FILTER = ['min_size', 'max_size', 'name_glob', 'model_regex', 'r
 DISK_TYPES = ['disk', 'rom', 'mpath']
 
 
-
-
 class LsBlkWrapper(object):
     """ LsBlkWrapper is a wrapper for 'lsblk' command line tool provided by util-linux
         It parses output of lsblk, builds block devices hierarchy in the system,
@@ -93,16 +91,16 @@ class LsBlkWrapper(object):
             host = iscsi_disk_path.split("/")[3]
             session = iscsi_disk_path.split("/")[4]
             connection = glob.glob(SYS_DEV + 'platform/' + host +
-                                            '/' + session + '/connection*')[0].split('/')[-1]
+                                             '/' + session + '/connection*')[0].split('/')[-1]
 
             try:
-                with open((ISCSI_TARGET_PATH % (host, session, connection, connection)) + '/address' ) as adr:
+                with open((ISCSI_TARGET_PATH % (host, session, connection, connection)) + '/address') as adr:
                     d['iscsi_target_ipaddr'] = adr.read().strip()
             except IOError:
                     d['iscsi_target_ipaddr'] = None
 
             try:
-                with open((ISCSI_TARGET_PATH % (host, session, connection, connection)) + '/port' ) as port:
+                with open((ISCSI_TARGET_PATH % (host, session, connection, connection)) + '/port') as port:
                     d['iscsi_target_port'] = port.read().strip()
             except IOError:
                     d['iscsi_target_port'] = None
@@ -159,7 +157,6 @@ class LsBlkWrapper(object):
             parent_stack.append([name, level])
 
         return disk_tree
-
 
     def _tree_traverse_and_apply(self, node, method, additional_arg_list=None):
         """ Preorder traversal for device tree and applying custom method on every

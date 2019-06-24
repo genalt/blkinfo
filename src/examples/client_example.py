@@ -23,9 +23,8 @@ def run_client(address):
             filters = {
                 'min_size': 200
             }
-            fields = None
-            #fields = ['serial', 'name', 'model']
-
+            #fields = None
+            fields = ['serial', 'name', 'model']
             ret = con.GetDisks(filters, fields)
             print(ret.blk_devices_json)
     except varlink.ConnectionError as e:
