@@ -1,7 +1,11 @@
+"""This module contains BlkDiskInfo class which implement filtering for
+block devices in a system
+"""
+
 import glob
 import re
 
-from .wrappers import LsBlkWrapper, DISK_TYPES, DISK_FILTERS, ADDITIONAL_DISK_FILTER, SYS_BLOCK
+from .wrappers import LsBlkWrapper, DISK_TYPES, ADDITIONAL_DISK_FILTER, SYS_BLOCK
 
 
 class BlkDiskInfo(LsBlkWrapper):
@@ -10,6 +14,8 @@ class BlkDiskInfo(LsBlkWrapper):
     """
 
     def get_disks(self, filters=None):
+        """method returns all disks available in the system, after applying filters"""
+
         result = []
         if not self._disks:
             return result
@@ -88,7 +94,8 @@ class BlkDiskInfo(LsBlkWrapper):
                         if not pattern.search(disk['model']):
                             all_filters_passed = False
                     elif f_name == 'empty':
-                        if (filters['empty'] and 'children' in disk) or (not filters['empty'] and 'children' not in disk):
+                        if (filters['empty'] and 'children' in disk) or \
+                                (not filters['empty'] and 'children' not in disk):
                             all_filters_passed = False
                     elif f_name == 'is_mounted':
                         disk_mounted = self._tree_traverse_and_apply(disk, LsBlkWrapper._is_mounted)

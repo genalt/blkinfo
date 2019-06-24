@@ -1,3 +1,8 @@
+"""This module contains different wrappers for cli tools
+to collect information about block devices connected to a
+system.
+"""
+
 import os
 import glob
 import subprocess
@@ -29,7 +34,7 @@ ISCSI_TARGET_PATH = SYS_DEV + 'platform/%s/%s/%s/iscsi_connection/%s'  # host, s
 #    ...
 
 DISK_FILTERS = ['name', 'kname', 'fstype', 'label', 'mountpoint', 'size', 'maj:min', 'rm',
-                'model', 'vendor', 'serial','hctl', 'tran', 'rota', 'type', 'ro', 'owner',
+                'model', 'vendor', 'serial', 'hctl', 'tran', 'rota', 'type', 'ro', 'owner',
                 'group', 'mode']
 
 
@@ -90,20 +95,19 @@ class LsBlkWrapper(object):
             iscsi_disk_path = os.readlink(SYS_BLOCK + d['name'])
             host = iscsi_disk_path.split("/")[3]
             session = iscsi_disk_path.split("/")[4]
-            connection = glob.glob(SYS_DEV + 'platform/' + host +
-                                             '/' + session + '/connection*')[0].split('/')[-1]
+            connection = glob.glob(SYS_DEV + 'platform/' + host + '/' + session + '/connection*')[0].split('/')[-1]
 
             try:
                 with open((ISCSI_TARGET_PATH % (host, session, connection, connection)) + '/address') as adr:
                     d['iscsi_target_ipaddr'] = adr.read().strip()
             except IOError:
-                    d['iscsi_target_ipaddr'] = None
+                d['iscsi_target_ipaddr'] = None
 
             try:
                 with open((ISCSI_TARGET_PATH % (host, session, connection, connection)) + '/port') as port:
                     d['iscsi_target_port'] = port.read().strip()
             except IOError:
-                    d['iscsi_target_port'] = None
+                d['iscsi_target_port'] = None
 
     @staticmethod
     def _get_disk_level(lsblk_disk_line):
@@ -141,7 +145,7 @@ class LsBlkWrapper(object):
             return {}
 
         # parse output of lsblk to build tree hierarchy
-        disk_hierarchy = subprocess.check_output(['lsblk', '-a', '-n', '-i', '-o',  'NAME']).decode('UTF-8')
+        disk_hierarchy = subprocess.check_output(['lsblk', '-a', '-n', '-i', '-o', 'NAME']).decode('UTF-8')
         parent_stack = []
         for disk_line in disk_hierarchy.split('\n'):
             level, name = LsBlkWrapper._get_disk_level(disk_line)
