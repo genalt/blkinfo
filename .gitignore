@@ -106,3 +106,10 @@ secrets/*.json
 secrets/*.zip
 secrets/*.gz
 secrets/*.tar
+
+# JetBrains IDE
+.idea
+
+# VS Code
+.vscode
+
