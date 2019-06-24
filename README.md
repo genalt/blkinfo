@@ -46,13 +46,13 @@ Information about all available block devices:
 
 ```python
    myblkd = BlkDiskInfo()
-   all_my_disk = myblkd.get_disk_list()
-   json_output = json.dumps(all_my_disk)
+   all_my_disks = myblkd.get_disks()
+   json_output = json.dumps(all_my_disks)
    print(json_output)
 ```
 
 
-Passing filters as an argument to the get_disk_list() method:
+Passing filters as an argument to the get_disks() method:
 
 ```python
    myblkd = BlkDiskInfo()
@@ -60,40 +60,11 @@ Passing filters as an argument to the get_disk_list() method:
       'tran': 'iscsi'
    }
 
-   all_my_disk = myblkd.get_disk_list(filters)
-   json_output = json.dumps(all_my_disk)
+   all_my_disks = myblkd.get_disks(filters)
+   json_output = json.dumps(all_my_disks)
    print(json_output)
 ```
 
-## Varslink Service
-
-There is also varlink service available. To run the service:
-
-```
-cd  ./src/varlink/
-python3 blkinfo_server.py --varlink="unix:@blkinfo"&
-```
-
-
-There are some scripts in the ./src/varlink/examples directory, with
-examples of how to use the varlink service.
-
-
-Also command line tool `varlink` is available from `rawhide` repository (Fedora 30 currently).
-To install:
-
-```
-sudo dnf install fedora-repos-rawhide -y
-sudo dnf install --enablerepo rawhide python3-varlink libvarlink-util
-```
-
-
-Then `varlink` cli tool can be used to call blkinfo methods:
-
-```
-varlink call unix:@blkinfo/com.redhat.blkinfo.GetDisks '{"filters": {"name": "sda"}}'
-
-```
 
 
 ## Filters
