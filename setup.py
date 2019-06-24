@@ -8,7 +8,7 @@ with open(path.join(this_directory, 'README.md')) as f:
 
 setup(
     name="blkinfo",
-    version="0.0.11",
+    version="0.1.1",
     author="Gennadii Altukhov",
     author_email="galt@redhat.com",
     description="blkinfo is a python package to list information about all available or the specified block devices.",
@@ -20,7 +20,7 @@ setup(
     package_dir={"": "src"},
     keywords='lsblk disk blockdevice blockinfo blkinfo iscsi',
     classifiers=[
-        "Development Status :: 2 - Pre-Alpha",
+        "Development Status :: 4 - Beta",
         "Programming Language :: Python",
         "Programming Language :: Python :: 3",
         "Topic :: Software Development :: Libraries :: Python Modules"
