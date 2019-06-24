@@ -11,7 +11,7 @@
 %endif
 
 Name:           python-%{pypi_name}
-Version:        0.1.1
+Version:        0.1.2
 Release:        1%{?dist}
 Summary:        blkinfo is a python library to list information about all available or the specified block devices.
 
