@@ -75,7 +75,7 @@ Passing filters as an argument to the get_disks() method:
 -    kname:      internal kernel device name
 -    size:       size of the device
 -    min_size:   min size for a device
--    max_size:   max size for a device (inlusive)
+-    max_size:   max size for a device
 -    maj:min     major and minor device numbers
 -    ra:         read-ahead device (e.g. type)
 -    ro:         read-only device
@@ -89,4 +89,14 @@ Passing filters as an argument to the get_disks() method:
 -    tran:       device transport type
 -    iscsi_target_ip:      used together with 'tran': 'iscsi'
 -    iscsi_target_port:    used together with 'tran': 'iscsi'
--    is_mounted:           does a disk have mounted partion
+-    is_mounted:           does a disk have mounted partition
+
+
+
+---
+**NOTE**:
+
+ If you have got a question or suggestion, please, file an issue on
+GitHub or submit a PR. https://github.com/grinrag/blkinfo
+
+---
