@@ -84,3 +84,7 @@ rm -rf %{pypi_name}.egg-info
 %{python3_sitelib}/%{pypi_name}-%{version}-py?.?.egg-info
 %endif
 
+%changelog
+* Thu Jul 11 2019 Gennadii Altukhov <grinrag@gmail.com> - 0.1.2-1
+- Initial RPM release
+
