@@ -20,27 +20,17 @@ URL:            https://github.com/grinrag/blkinfo
 Source0:        https://files.pythonhosted.org/packages/source/b/%{pypi_name}/%{pypi_name}-%{version}.tar.gz
 BuildArch:      noarch
 
-BuildRequires:  python2-devel
-BuildRequires:  python-setuptools
-
 %if 0%{?build_py3}
 BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools
+%else
+BuildRequires:  python2-devel
+BuildRequires:  python-setuptools
 %endif
 
 
 
 %description
-blkinfo is a python library to list information
-about all available or the specified block devices. It is based on lsblk command
-line tool, provided by util-linux, in addition, it collects information about
-block devices, using /sys/block, /sys/devices, /proc directories.
-
-%package -n     python2-%{pypi_name}
-Summary:        %{summary}
-%{?python_provide:%python_provide python2-%{pypi_name}}
-Requires:  util-linux
-%description -n python2-%{pypi_name}
 blkinfo is a python library to list information
 about all available or the specified block devices. It is based on lsblk command
 line tool, provided by util-linux, in addition, it collects information about
@@ -56,6 +46,16 @@ blkinfo is a python library to list information
 about all available or the specified block devices. It is based on lsblk command
 line tool, provided by util-linux, in addition, it collects information about
 block devices, using /sys/block, /sys/devices, /proc directories.
+%else
+%package -n     python2-%{pypi_name}
+Summary:        %{summary}
+%{?python_provide:%python_provide python2-%{pypi_name}}
+Requires:  util-linux
+%description -n python2-%{pypi_name}
+blkinfo is a python library to list information
+about all available or the specified block devices. It is based on lsblk command
+line tool, provided by util-linux, in addition, it collects information about
+block devices, using /sys/block, /sys/devices, /proc directories.
 %endif
 
 %prep
@@ -64,24 +64,26 @@ block devices, using /sys/block, /sys/devices, /proc directories.
 rm -rf %{pypi_name}.egg-info
 
 %build
-%py2_build
 %if 0%{?build_py3}
 %py3_build
+%else
+%py2_build
 %endif
 
 %if 0%{?build_py3}
 %py3_install
-%endif
+%else
 %py2_install
-
-%files -n python2-%{pypi_name}
-%{python2_sitelib}/%{pypi_name}
-%{python2_sitelib}/%{pypi_name}-%{version}-py?.?.egg-info
+%endif
 
 %if 0%{?build_py3}
 %files -n python3-%{pypi_name}
 %{python3_sitelib}/%{pypi_name}
 %{python3_sitelib}/%{pypi_name}-%{version}-py?.?.egg-info
+%else
+%files -n python2-%{pypi_name}
+%{python2_sitelib}/%{pypi_name}
+%{python2_sitelib}/%{pypi_name}-%{version}-py?.?.egg-info
 %endif
 
 %changelog
