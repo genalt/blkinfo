@@ -93,6 +93,14 @@ Passing filters as an argument to the get_disks() method:
 
 
 
+## Roadmap
+
+1. Now `blkinfo` library is using `lsblk` command line tool directly.
+   The good idea is to create `lsblk` core library in C and just add bindings in Python.
+   https://github.com/karelzak/util-linux/issues/839
+
+
+
 ---
 **NOTE**:
 
