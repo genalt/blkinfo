@@ -180,7 +180,7 @@ class LsBlkWrapper(object):
         if node['children']:
             for child_name in node['children']:
                 child_node = self._disks[child_name]
-                stop_result = LsBlkWrapper._tree_traverse_and_apply(child_node, method, additional_arg_list)
+                stop_result = self._tree_traverse_and_apply(child_node, method, additional_arg_list)
                 if stop_result:
                     return stop_result
 
@@ -189,6 +189,6 @@ class LsBlkWrapper(object):
     @staticmethod
     def _is_mounted(blkdev_info_dict):
         """Method to check if partition is mounted"""
-        if blkdev_info_dict['mountpoint'] is not None:
+        if blkdev_info_dict['mountpoint']:
             return True
         return False
