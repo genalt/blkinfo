@@ -10,7 +10,7 @@ setup(
     name="blkinfo",
     version="0.1.3",
     author="Gennadii Altukhov",
-    author_email="galt@redhat.com",
+    author_email="grinrag@gmail.com",
     description="blkinfo is a python package to list information about all available or the specified block devices.",
     long_description=long_description,
     long_description_content_type='text/markdown',

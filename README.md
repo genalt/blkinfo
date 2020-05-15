@@ -1,6 +1,6 @@
 # blkinfo - Block Devices Information
 
-[![PyPI version fury.io](https://badge.fury.io/py/blkinfo.svg)](https://pypi.python.org/pypi/ansicolortags/)  [![PyPI download day](https://img.shields.io/pypi/dd/blkinfo)](https://pypi.python.org/pypi/blkinfo/)  [![PyPI download month](https://img.shields.io/pypi/dm/blkinfo)](https://pypi.python.org/pypi/blkinfo/)
+[![PyPI version fury.io](https://badge.fury.io/py/blkinfo.svg)](https://pypi.python.org/pypi/blkinfo/)  [![PyPI download day](https://img.shields.io/pypi/dd/blkinfo)](https://pypi.python.org/pypi/blkinfo/)  [![PyPI download month](https://img.shields.io/pypi/dm/blkinfo)](https://pypi.python.org/pypi/blkinfo/)
 
 
 ## Library
