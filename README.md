@@ -22,16 +22,16 @@ Additional features to `lsblk`:
 
 ### Installation
 
-Install python's package from PyPI repository using `pip` util:
+Install python's package from PyPI repository using `pip` util (default is Python 3):
 
 ```
-pip3 install blkinfo
-
 pip install blkinfo
+
+pip2 install blkinfo
 ```
 
 
-Install rpm package from Copr.
+Install rpm package from Copr (experimental).
 
 ```
 dnf copr enable galt/blkinfo
@@ -48,24 +48,30 @@ dnf install python3-blkinfo
 Information about all available block devices:
 
 ```python
-   myblkd = BlkDiskInfo()
-   all_my_disks = myblkd.get_disks()
-   json_output = json.dumps(all_my_disks)
-   print(json_output)
+import json
+from blkinfo import BlkDiskInfo
+
+myblkd = BlkDiskInfo()
+all_my_disks = myblkd.get_disks()
+json_output = json.dumps(all_my_disks)
+print(json_output)
 ```
 
 
 Passing filters as an argument to the get_disks() method:
 
 ```python
-   myblkd = BlkDiskInfo()
-   filters = {
-      'tran': 'iscsi'
-   }
+import json
+from blkinfo import BlkDiskInfo
 
-   all_my_disks = myblkd.get_disks(filters)
-   json_output = json.dumps(all_my_disks)
-   print(json_output)
+myblkd = BlkDiskInfo()
+filters = {
+   'tran': 'iscsi'
+}
+
+my_filtered_disks = myblkd.get_disks(filters)
+json_output = json.dumps(my_filtered_disks)
+print(json_output)
 ```
 
 
