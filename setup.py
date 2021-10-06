@@ -4,15 +4,15 @@ from setuptools import setup
 from os import path
 this_directory = path.abspath(path.dirname(__file__))
 with open(path.join(this_directory, 'README.md')) as f:
-    long_description = f.read()
+    readme_file = f.read()
 
 setup(
     name="blkinfo",
-    version="0.1.4",
+    version="0.1.5",
     author="Gennadii Altukhov",
     author_email="grinrag@gmail.com",
     description="blkinfo is a python package to list information about all available or the specified block devices.",
-    long_description=long_description,
+    long_description=readme_file,
     long_description_content_type='text/markdown',
     license="GPLv3",
     url="https://github.com/grinrag/blkinfo",
