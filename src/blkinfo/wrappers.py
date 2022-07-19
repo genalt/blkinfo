@@ -153,8 +153,11 @@ class LsBlkWrapper(object):
             while parent_stack:
                 p = parent_stack.pop()
                 if p[1] < level:
-                    disk_tree[p[0]]['children'].append(disk_tree[name])
-                    disk_tree[name]['parents'].append(p[0])
+                    try:
+                        disk_tree[p[0]]['children'].append(disk_tree[name])
+                        disk_tree[name]['parents'].append(p[0])
+                    except KeyError:
+                        continue 
                     parent_stack.append(p)
                     break
 
