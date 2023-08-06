@@ -35,7 +35,7 @@ class BlkDiskInfo(LsBlkWrapper):
 
                 # if raid is assembled with parents w/o partitions
                 # we should show only raid and ignore all parents
-                ignore_parents = True
+                ignore_parents = False
 
                 for p in self._disks[dn]['parents']:
                     if len(self._disks[p]['children']) != 1:
