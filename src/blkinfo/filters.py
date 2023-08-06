@@ -13,7 +13,7 @@ class BlkDiskInfo(LsBlkWrapper):
         disks available in the system and different parameters related to block devices
     """
 
-    def get_disks(self, filters=None):
+    def get_disks(self, filters=None, ignore_raid_parents=True):
         """method returns all disks available in the system, after applying filters"""
 
         result = []
@@ -35,14 +35,13 @@ class BlkDiskInfo(LsBlkWrapper):
 
                 # if raid is assembled with parents w/o partitions
                 # we should show only raid and ignore all parents
-                ignore_parents = False
 
                 for p in self._disks[dn]['parents']:
                     if len(self._disks[p]['children']) != 1:
-                        ignore_parents = False
+                        ignore_raid_parents = False
                         break
 
-                if ignore_parents:
+                if ignore_raid_parents:
                     for p in self._disks[dn]['parents']:
                         blacklist.add(p)
 
